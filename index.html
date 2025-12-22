@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>一言生成器</title>
+  <title>每日一言生成器</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     body{
@@ -11,7 +11,19 @@
       font-family:'STSong','Songti SC','SimSun',serif;
       display:flex;justify-content:center;align-items:center;
       min-height:100vh;padding:20px;position:relative;
+      transition:background .3s ease, color .3s ease;
     }
+    /* 反色样式 */
+    body.inverted{background:#fff;color:#000;}
+    body.inverted .calendar-card{border-color:#000;background:#fff;}
+    body.inverted .header{border-bottom-color:#000;}
+    body.inverted .divider{background:#000;}
+    body.inverted .author{color:#333;}
+    body.inverted .qr-box{background:#000;}
+    body.inverted .qr-box img{filter:invert(1);}
+    body.inverted .back-btn{border-color:#000;color:#000;}
+    body.inverted .back-btn:hover{background:#000;color:#fff;}
+
     /* 输入框 */
     .input-container{
       max-width:600px;width:100%;
@@ -50,8 +62,8 @@
       bottom:50px;                /* 与卡片距离 */
       display:none;z-index:1000;
     }
-    .controls-wrap{display:flex;gap:30px;align-items:center;}
-    .back-btn{padding:12px 24px;background:transparent;color:#fff;border:1px solid #fff;cursor:pointer;font-size:14px;letter-spacing:1px;transition:all .3s ease;white-space:nowrap;}
+    .controls-wrap{display:flex;gap:15px;align-items:center;}
+    .back-btn{padding:12px 20px;background:transparent;color:#fff;border:1px solid #fff;cursor:pointer;font-size:14px;letter-spacing:1px;transition:all .3s ease;white-space:nowrap;}
     .back-btn:hover{background:#fff;color:#000;}
     .qr-box{width:120px;height:120px;border:1px solid #fff;background:#fff;display:flex;align-items:center;justify-content:center;}
     .qr-box img{width:100%;height:100%;object-fit:contain;}
@@ -62,9 +74,9 @@
       .quote-title{font-size:24px;letter-spacing:4px;}
       .quote-content{font-size:16px;}
       .bottom-bar{bottom:30px;}
-      .controls-wrap{gap:20px;}
+      .controls-wrap{gap:10px;}
       .qr-box{width:100px;height:100px;}
-      .back-btn{padding:10px 20px;font-size:12px;}
+      .back-btn{padding:10px 16px;font-size:12px;}
     }
   </style>
 </head>
@@ -110,6 +122,7 @@
     <div class="controls-wrap">
       <button class="back-btn" onclick="showInput()">返回输入</button>
       <button class="back-btn" id="saveBtn" style="display:none;">保存为图片</button>
+      <button class="back-btn" id="invertBtn" style="display:none;">反色</button>
       <div class="qr-box">
         <img src="https://laodaya.oss-cn-beijing.aliyuncs.com/LaoDaWeiXin.png" alt="二维码">
       </div>
@@ -151,12 +164,15 @@
       document.getElementById('calendarCard').style.display='block';
       document.getElementById('bottomBar').style.display='block';
       document.getElementById('saveBtn').style.display='inline-block';
+      document.getElementById('invertBtn').style.display='inline-block';
     }
     function showInput(){
       document.getElementById('inputContainer').style.display='block';
       document.getElementById('calendarCard').style.display='none';
       document.getElementById('bottomBar').style.display='none';
       document.getElementById('saveBtn').style.display='none';
+      document.getElementById('invertBtn').style.display='none';
+      document.body.classList.remove('inverted'); // 重置颜色
     }
     window.onload=updateDateTime;
 
@@ -164,7 +180,7 @@
     document.getElementById('saveBtn').addEventListener('click', async ()=>{
       const card = document.getElementById('calendarCard');
       const canvas = await html2canvas(card, {
-          backgroundColor: '#000',
+          backgroundColor: getComputedStyle(card).backgroundColor,
           scale: 3
       });
       canvas.toBlob(blob=>{
@@ -175,6 +191,11 @@
         a.click();
         URL.revokeObjectURL(url);
       }, 'image/png');
+    });
+
+    /* 反色切换 */
+    document.getElementById('invertBtn').addEventListener('click', ()=>{
+      document.body.classList.toggle('inverted');
     });
   </script>
 </body>
