@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>每日一言生成器</title>
+  <title>一言生成器</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     body{
@@ -109,12 +109,15 @@
   <div class="bottom-bar" id="bottomBar">
     <div class="controls-wrap">
       <button class="back-btn" onclick="showInput()">返回输入</button>
+      <button class="back-btn" id="saveBtn" style="display:none;">保存为图片</button>
       <div class="qr-box">
-        <!-- 这里插入你提供的二维码图片 -->
         <img src="https://laodaya.oss-cn-beijing.aliyuncs.com/LaoDaWeiXin.png" alt="二维码">
       </div>
     </div>
   </div>
+
+  <!-- 引入 html2canvas -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
     /* 农历简化计算 */
@@ -147,13 +150,32 @@
       document.getElementById('inputContainer').style.display='none';
       document.getElementById('calendarCard').style.display='block';
       document.getElementById('bottomBar').style.display='block';
+      document.getElementById('saveBtn').style.display='inline-block';
     }
     function showInput(){
       document.getElementById('inputContainer').style.display='block';
       document.getElementById('calendarCard').style.display='none';
       document.getElementById('bottomBar').style.display='none';
+      document.getElementById('saveBtn').style.display='none';
     }
     window.onload=updateDateTime;
+
+    /* 保存为图片 */
+    document.getElementById('saveBtn').addEventListener('click', async ()=>{
+      const card = document.getElementById('calendarCard');
+      const canvas = await html2canvas(card, {
+          backgroundColor: '#000',
+          scale: 3
+      });
+      canvas.toBlob(blob=>{
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `每日一言_${new Date().getTime()}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    });
   </script>
 </body>
 </html>
