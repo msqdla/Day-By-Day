@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>每日一言生成器</title>
+  <title>一日一句·金句日历生成器 1.0</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     body{
@@ -16,7 +16,6 @@
     /* 反色样式 */
     body.inverted{background:#fff;color:#000;}
     body.inverted .calendar-card{border-color:#000;background:#fff;}
-    body.inverted .calendar-card::before{border-color:#000;}
     body.inverted .header{border-bottom-color:#000;}
     body.inverted .divider{background:#000;}
     body.inverted .author{color:#333;}
@@ -39,22 +38,21 @@
     .generate-btn{width:100%;padding:15px;background:#fff;color:#000;border:none;font-size:16px;letter-spacing:2px;cursor:pointer;transition:all .3s ease;}
     .generate-btn:hover{background:#ccc;}
 
-    /* 日历卡片 - 双层边框 */
+    /* 日历卡片 - 双层边框（无伪元素） */
     .calendar-card{
-      border: 4px solid #fff;      /* 外框：粗 */
+      border: 4px solid #fff;      /* 外粗框 */
       max-width:600px;width:100%;
-      padding:40px;display:none;position:relative;
+      padding:10px;                 /* 留出细框位置 */
+      display:none;position:relative;
       margin-bottom:180px;
-      background:#000; /* 确保内框可见 */
+      background:#000;
     }
-    .calendar-card::before{          /* 内框：细 */
-      content:'';
-      position:absolute;
-      top:10px;left:10px;right:10px;bottom:10px;
-      border:1px solid #fff;
-      pointer-events:none;
+    .inner-card{
+      border:1px solid #fff;       /* 内细框 */
+      padding:30px 25px;
+      background:transparent;
     }
-    .header{display:flex;justify-content:space-between;align-items:center;padding-bottom:20px;border-bottom:1px solid #fff;margin-bottom:60px;}
+    .header{display:flex;justify-content:space-between;align-items:center;padding-bottom:20px;border-bottom:1px solid #fff;margin-bottom:40px;}
     .month{font-size:18px;letter-spacing:2px;}
     .lunar-date{font-size:14px;text-align:center;letter-spacing:1px;}
     .weekday{font-size:18px;letter-spacing:2px;}
@@ -63,7 +61,7 @@
     .divider{width:100%;height:1px;background:#fff;margin:40px 0;}
     .quote-content{
       font-size:18px;line-height:2;text-align:justify;letter-spacing:1px;margin-bottom:60px;
-      word-wrap:break-word;overflow-wrap:break-word; /* 修复文字溢出 */
+      word-wrap:break-word;overflow-wrap:break-word;
     }
     .author{font-size:14px;color:#ccc;letter-spacing:1px;margin-bottom:40px;}
     .year-display{font-size:14px;letter-spacing:1px;text-align:center;margin-top:10px;}
@@ -72,7 +70,7 @@
     /* 底部控制栏 */
     .bottom-bar{
       position:absolute;left:50%;transform:translateX(-50%);
-      bottom:50px;                /* 与卡片距离 */
+      bottom:50px;
       display:none;z-index:1000;
     }
     .controls-wrap{display:flex;gap:10px;align-items:center;}
@@ -82,7 +80,8 @@
     .qr-box img{width:100%;height:100%;object-fit:contain;}
 
     @media(max-width:768px){
-      .calendar-card{padding:20px;margin-bottom:160px;}
+      .calendar-card{padding:8px;margin-bottom:160px;}
+      .inner-card{padding:20px 15px;}
       .date-number{font-size:180px;}
       .quote-title{font-size:24px;letter-spacing:4px;}
       .quote-content{font-size:16px;}
@@ -96,7 +95,7 @@
 <body>
   <!-- 输入阶段 -->
   <div class="input-container" id="inputContainer">
-    <h1 class="input-title">每日一言生成器</h1>
+    <h1 class="input-title">一日一句·金句日历生成器 1.0</h1>
     <div class="input-group">
       <div class="input-label">名言标题</div>
       <input type="text" class="input-field" id="quoteTitle" placeholder="请输入名言标题">
@@ -112,22 +111,24 @@
     <button class="generate-btn" onclick="generateQuote()">生成页面</button>
   </div>
 
-  <!-- 生成结果卡片 -->
+  <!-- 生成结果卡片 - 双层边框 -->
   <div class="calendar-card" id="calendarCard">
-    <div class="header">
-      <div class="month" id="monthDisplay">十二月</div>
-      <div class="lunar-date" id="lunarDisplay">农历十月廿五 乙巳年</div>
-      <div class="weekday" id="weekdayDisplay">星期日</div>
+    <div class="inner-card">
+      <div class="header">
+        <div class="month" id="monthDisplay">十二月</div>
+        <div class="lunar-date" id="lunarDisplay">农历十月廿五 乙巳年</div>
+        <div class="weekday" id="weekdayDisplay">星期日</div>
+      </div>
+      <div class="year-display" id="yearDisplay">2025年</div>
+      <div class="date-number" id="dateDisplay">14</div>
+      <div class="quote-title" id="generatedTitle">忠言不由衷</div>
+      <div class="divider"></div>
+      <div class="quote-content" id="generatedContent">
+        我想，如果严格按照这个定义，写故事的作家——如果在经济上获利了的话，那他也是在撒谎。
+      </div>
+      <div class="author" id="generatedAuthor">《伊甸之东》 作家, 约翰·斯坦贝克 John Steinbeck</div>
+      <div class="watermark"></div>
     </div>
-    <div class="year-display" id="yearDisplay">2025年</div>
-    <div class="date-number" id="dateDisplay">14</div>
-    <div class="quote-title" id="generatedTitle">忠言不由衷</div>
-    <div class="divider"></div>
-    <div class="quote-content" id="generatedContent">
-      我想，如果严格按照这个定义，写故事的作家——如果在经济上获利了的话，那他也是在撒谎。
-    </div>
-    <div class="author" id="generatedAuthor">《伊甸之东》 作家, 约翰·斯坦贝克 John Steinbeck</div>
-    <div class="watermark"></div>
   </div>
 
   <!-- 底部控制栏（卡片外） -->
@@ -195,7 +196,7 @@
       const canvas = await html2canvas(card, {
           backgroundColor: getComputedStyle(card).backgroundColor,
           scale: 3,
-          useCORS: true, // 允许跨域图片（二维码）
+          useCORS: true,
           logging: false
       });
       canvas.toBlob(blob=>{
